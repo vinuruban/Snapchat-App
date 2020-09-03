@@ -1,7 +1,10 @@
 package com.vinu.snapchat
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
@@ -33,7 +36,15 @@ class MainActivity : AppCompatActivity() {
                 if (task.isSuccessful) { //LOGIN
                     login()
                 } else {
-                    signup()
+                    if (password?.text.toString().length < 6) {
+                        Toast.makeText(
+                            this,
+                            "Password must be at least 6 characters",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        signup()
+                    }
                 }
 
                 // ...
@@ -48,7 +59,7 @@ class MainActivity : AppCompatActivity() {
     fun signup() {
         auth.createUserWithEmailAndPassword(email?.text.toString(), password?.text.toString())
             .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) { //LOGIN
+                if (task.isSuccessful) { //SINCE THEY ARE SIGNED UP NOW, LOG THEM IN
                     login()
                 } else {
                     // If log in fails
