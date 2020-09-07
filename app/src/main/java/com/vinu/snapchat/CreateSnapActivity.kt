@@ -23,7 +23,7 @@ import java.util.*
 class CreateSnapActivity : AppCompatActivity() {
 
     var snapImageView: ImageView? = null //ImageView is optional and initially set to null
-    var messageEditText: EditText? = null //EditText is optional and initially set to null
+    var captionEditText: EditText? = null //EditText is optional and initially set to null
     val uniqueImageName = UUID.randomUUID().toString() + ".jpg" //random + unique name for each imgs
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,7 +31,7 @@ class CreateSnapActivity : AppCompatActivity() {
         setContentView(R.layout.activity_create_snap)
 
         snapImageView = findViewById(R.id.imageView)
-        messageEditText = findViewById(R.id.addMsg)
+        captionEditText = findViewById(R.id.addCaption)
 
         setTitle("Create a new snap")
     }
@@ -88,12 +88,17 @@ class CreateSnapActivity : AppCompatActivity() {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos) //converts bitmap to jpeg
         val data: ByteArray = baos.toByteArray()
 
-        val uploadTask: UploadTask = FirebaseStorage.getInstance().getReference().child("images").child(uniqueImageName).putBytes(data) //creates an "images" folder (if it wasn't previously created) and stores an img inside
+        val uploadTask: UploadTask = FirebaseStorage.getInstance().getReference().child("images").child(uniqueImageName).putBytes(data) // CLOUD STORAGE - creates an "images" folder (if it wasn't previously created) and stores an img inside
         uploadTask.addOnFailureListener {
             // Handle unsuccessful uploads
             Toast.makeText(applicationContext, "Couldn't upload snap", Toast.LENGTH_SHORT).show()
         }.addOnSuccessListener {
             // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+            val intent = Intent(this, ChooseUserActivity::class.java)
+            intent.putExtra("imageUrl", it.uploadSessionUri.toString())
+            intent.putExtra("uniqueImageName", uniqueImageName)
+            intent.putExtra("caption", captionEditText?.text.toString())
+            startActivity(intent)
         }
     }
 }

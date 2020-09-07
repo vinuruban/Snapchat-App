@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 class MainActivity : AppCompatActivity() {
 
@@ -60,7 +61,11 @@ class MainActivity : AppCompatActivity() {
         auth.createUserWithEmailAndPassword(email?.text.toString(), password?.text.toString())
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) { //SINCE THEY ARE SIGNED UP NOW, LOG THEM IN
-                    login()
+                    var userID = task.result?.user?.uid
+                    if (userID != null) {
+                        FirebaseDatabase.getInstance().getReference().child("users").child(userID).child("email").setValue(email?.text.toString()) // REALTIME DATABASE - creates an "user" folder (if it wasn't previously created) and stores user details inside
+                        login()
+                    }
                 } else {
                     // If log in fails
                     Toast.makeText(this, "Login failed. Try again", Toast.LENGTH_SHORT).show()
