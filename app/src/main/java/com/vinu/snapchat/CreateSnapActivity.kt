@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -88,17 +89,23 @@ class CreateSnapActivity : AppCompatActivity() {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos) //converts bitmap to jpeg
         val data: ByteArray = baos.toByteArray()
 
+        /** Create snap **/
         val uploadTask: UploadTask = FirebaseStorage.getInstance().getReference().child("images").child(uniqueImageName).putBytes(data) // CLOUD STORAGE - creates an "images" folder (if it wasn't previously created) and stores an img inside
+
+        //What to do when successfully/unsuccessfully uploaded
         uploadTask.addOnFailureListener {
             // Handle unsuccessful uploads
             Toast.makeText(applicationContext, "Couldn't upload snap", Toast.LENGTH_SHORT).show()
         }.addOnSuccessListener {
             // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
             val intent = Intent(this, ChooseUserActivity::class.java)
-            intent.putExtra("imageUrl", it.uploadSessionUri.toString())
+
+            intent.putExtra("imageUrl", it.storage.downloadUrl.toString())
+
             intent.putExtra("uniqueImageName", uniqueImageName)
             intent.putExtra("caption", captionEditText?.text.toString())
             startActivity(intent)
         }
+
     }
 }
