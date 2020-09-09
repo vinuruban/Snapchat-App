@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".OpenSnapActivity"></activity>
-        <activity android:name=".ChooseUserActivity" />
+        <activity android:name=".ChooseUserActivity" android:theme="@style/ChooseUserTheme" />
         <activity android:name=".CreateSnapActivity" />
         <activity android:name=".SnapsActivity" />
         <activity android:name=".MainActivity">

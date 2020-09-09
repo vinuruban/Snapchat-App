@@ -99,9 +99,6 @@ class CreateSnapActivity : AppCompatActivity() {
         }.addOnSuccessListener {
             // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
             val intent = Intent(this, ChooseUserActivity::class.java)
-
-            intent.putExtra("imageUrl", it.storage.downloadUrl.toString())
-
             intent.putExtra("uniqueImageName", uniqueImageName)
             intent.putExtra("caption", captionEditText?.text.toString())
             startActivity(intent)

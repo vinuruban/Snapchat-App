@@ -33,7 +33,7 @@ class SnapsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_snaps)
 
-        setTitle(auth.currentUser?.email)
+        setTitle("Snapchat: " + auth.currentUser?.email)
 
         snapsListView = findViewById(R.id.snapsListView)
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, snapUsers)
@@ -76,7 +76,6 @@ class SnapsActivity : AppCompatActivity() {
 
             var intent = Intent(this, OpenSnapActivity::class.java)
 
-            intent.putExtra("imageUrl", snapshot.child("imageUrl").value as String)
             intent.putExtra("uniqueImageName", snapshot.child("imageName").value as String)
             intent.putExtra("caption", snapshot.child("caption").value as String)
             intent.putExtra("snapUUID", snapshot.key) //to delete the snap after being viewed

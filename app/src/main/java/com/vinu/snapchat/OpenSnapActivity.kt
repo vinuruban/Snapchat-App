@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -22,7 +23,6 @@ class OpenSnapActivity : AppCompatActivity() {
 
     var snapImageView: ImageView? = null
     var captionTextView: TextView? = null
-    var imageUrl: String? = null //to get image url from Firebase Storage
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,27 +34,29 @@ class OpenSnapActivity : AppCompatActivity() {
         captionTextView = findViewById(R.id.snapTextView)
 
         /** set captionTextView **/
-        captionTextView?.text = intent.getStringExtra("caption")
+        val caption = intent.getStringExtra("caption")
+        if (caption.equals("")) {
+            captionTextView?.visibility = View.INVISIBLE
+        } else {
+            captionTextView?.text = intent.getStringExtra("caption")
+        }
 
-        /** get image url from Firebase Storage **/
+        /** get image url from Firebase Storage & set snapImageView **/
         val taskSnapshot: StorageReference = FirebaseStorage.getInstance().getReference().child("images").child(intent.getStringExtra("uniqueImageName"))
 
         taskSnapshot.downloadUrl.addOnSuccessListener(OnSuccessListener<Any> { uri ->
-            imageUrl = uri.toString() // Got the Image URL!
-            Log.i("this ", imageUrl);
+            val imageUrl = uri.toString() // Got the Image URL!
+            val task = ImageDownloader()
+            val myImage: Bitmap
+            try {
+                myImage = task.execute(imageUrl).get()!! //calls ImageDownloader
+                snapImageView?.setImageBitmap(myImage) //then sets image!
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+            }
         }).addOnFailureListener(OnFailureListener {
             Toast.makeText(applicationContext, "Couldn't download URL", Toast.LENGTH_SHORT).show()
         })
-
-        /** set snapImageView **/
-        val task = ImageDownloader()
-        val myImage: Bitmap
-        try {
-            myImage = task.execute(imageUrl).get()!! //calls ImageDownloader
-            snapImageView?.setImageBitmap(myImage)
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-        }
 
     }
 
