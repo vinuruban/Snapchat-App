@@ -23,7 +23,7 @@ import com.google.firebase.storage.UploadTask
 
 class SnapsActivity : AppCompatActivity() {
 
-    val auth = FirebaseAuth.getInstance()
+    val auth = FirebaseAuth.getInstance() //current user
     var snapsListView: ListView? = null
     var snapUsers: ArrayList<String> = ArrayList() //users who sent snap to you will be logged here
     var snaps: ArrayList<DataSnapshot> = ArrayList() //to retrieve data from the Firebase Database of the snap that's clicked on
@@ -40,24 +40,32 @@ class SnapsActivity : AppCompatActivity() {
         snapsListView?.adapter = adapter
 
         /** when a snap is sent to a user, their homepage will get updated with the list of users who snapped them! **/
+        /** the following code displays the snaps on the homepage (SnapsAcitivity) **/
         FirebaseDatabase.getInstance().getReference().child("users").child(auth.currentUser?.uid!!).child(
             "snaps"
         ).addChildEventListener(object :
             ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                val email =
-                    snapshot.child("from").value as String //within the 'snaps' tab of Firebase Database, we retrieve the list of users who snapped them!
+                val email = snapshot.child("from").value as String //within the 'snaps' tab of Firebase Database, we retrieve the list of users who snapped them (from the 'from' tab)!
                 snapUsers.add(email)
                 snaps.add(snapshot) //to store data of the snap that was clicked on, from the Firebase Database
                 adapter.notifyDataSetChanged()
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                //not needed
+                //not needed since we aren't updating data
             }
 
-            override fun onChildRemoved(snapshot: DataSnapshot) {
-                //not needed
+            override fun onChildRemoved(snapshot: DataSnapshot) { /** to update the UI after the snaps are deleted - see onBackPressed() of OpenSnapActivity **/
+                var index = 0
+                for(snap: DataSnapshot in snaps) { //looping through to help find the index. This will be used to delete the entry in 'snapUsers' and 'snaps' ArrayList
+                    if (snap.key == snapshot?.key) {
+                        snapUsers.removeAt(index)
+                        snaps.removeAt(index)
+                    }
+                    index++
+                }
+                adapter.notifyDataSetChanged()
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
@@ -70,7 +78,7 @@ class SnapsActivity : AppCompatActivity() {
 
         })
 
-        /** When clicking on the new snap that was sent to you**/
+        /** When clicking on the new snap that was sent to you **/
         snapsListView?.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
             val snapshot = snaps.get(position) //get data of the snap that was clicked on
 
@@ -78,7 +86,7 @@ class SnapsActivity : AppCompatActivity() {
 
             intent.putExtra("uniqueImageName", snapshot.child("imageName").value as String)
             intent.putExtra("caption", snapshot.child("caption").value as String)
-            intent.putExtra("snapUUID", snapshot.key) //to delete the snap after being viewed
+            intent.putExtra("snapUUID", snapshot.key) //needed to help delete the snap after viewing it
 
             startActivity(intent)
         }

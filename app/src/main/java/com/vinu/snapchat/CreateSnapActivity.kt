@@ -80,7 +80,6 @@ class CreateSnapActivity : AppCompatActivity() {
     }
 
     fun onClickNext(view: View) {
-// Get the data from an ImageView as bytes
         // Get the data from an ImageView as bytes
         snapImageView?.setDrawingCacheEnabled(true)
         snapImageView?.buildDrawingCache()
@@ -97,7 +96,6 @@ class CreateSnapActivity : AppCompatActivity() {
             // Handle unsuccessful uploads
             Toast.makeText(applicationContext, "Couldn't upload snap", Toast.LENGTH_SHORT).show()
         }.addOnSuccessListener {
-            // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
             val intent = Intent(this, ChooseUserActivity::class.java)
             intent.putExtra("uniqueImageName", uniqueImageName)
             intent.putExtra("caption", captionEditText?.text.toString())

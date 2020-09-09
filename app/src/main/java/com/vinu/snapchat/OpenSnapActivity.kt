@@ -12,6 +12,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import java.io.InputStream
@@ -21,6 +23,7 @@ import java.net.URL
 
 class OpenSnapActivity : AppCompatActivity() {
 
+    val auth = FirebaseAuth.getInstance() //current user
     var snapImageView: ImageView? = null
     var captionTextView: TextView? = null
 
@@ -38,7 +41,7 @@ class OpenSnapActivity : AppCompatActivity() {
         if (caption.equals("")) {
             captionTextView?.visibility = View.INVISIBLE
         } else {
-            captionTextView?.text = intent.getStringExtra("caption")
+            captionTextView?.text = caption
         }
 
         /** get image url from Firebase Storage & set snapImageView **/
@@ -74,6 +77,21 @@ class OpenSnapActivity : AppCompatActivity() {
                 null
             }
         }
+    }
+
+    /** Delete snap when clicked back **/
+    override fun onBackPressed() {
+        super.onBackPressed()
+
+        Toast.makeText(applicationContext, "Snap deleted!", Toast.LENGTH_SHORT).show()
+
+        //Delete snap from Database
+        val uuid = intent.getStringExtra("snapUUID")
+        FirebaseDatabase.getInstance().getReference().child("users").child(auth.currentUser?.uid!!).child("snaps").child(uuid).removeValue()
+
+        //Delete snap image from Storage
+        val imageName = intent.getStringExtra("uniqueImageName")
+        FirebaseStorage.getInstance().getReference().child("images").child(imageName).delete()
     }
 
 }

@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
 
     var email: EditText? = null //EditText is optional and initially set to null
     var password: EditText? = null //EditText is optional and initially set to null
-    val auth = FirebaseAuth.getInstance()
+    val auth = FirebaseAuth.getInstance() //current user
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     fun onClickButton(view: View) {
         auth.signInWithEmailAndPassword(email?.text.toString(), password?.text.toString())
             .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) { //LOGIN
+                if (task.isSuccessful) { //IF USER ALREADY EXISTS, LOG THEM IN
                     login()
                 } else {
                     if (password?.text.toString().length < 6) {
@@ -43,12 +43,10 @@ class MainActivity : AppCompatActivity() {
                             "Password must be at least 6 characters",
                             Toast.LENGTH_SHORT
                         ).show()
-                    } else {
+                    } else { //IF USER DOESN'T EXIST, SIGN THEM UP
                         signup()
                     }
                 }
-
-                // ...
             }
     }
 
@@ -70,8 +68,6 @@ class MainActivity : AppCompatActivity() {
                     // If log in fails
                     Toast.makeText(this, "Login failed. Try again", Toast.LENGTH_SHORT).show()
                 }
-
-                // ...
             }
     }
 
